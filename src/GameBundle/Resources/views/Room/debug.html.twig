@@ -1,0 +1,109 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <h1>СОЗДАТЕЛЬ КОМНАТЫ</h1>
+        <ul>
+            <li>
+                <p>{{ room.creator.username }}</p>
+            </li>
+        </ul>
+    <h1>ДАННЫЕ КОМНАТЫ</h1>
+        <ul>
+            <li><p>Статус: {{ room.status }}</p></li>
+            <li><p>Фаза: {{ room.phase }}</p></li>
+        </ul>
+    <h1>ИГРОКИ КОМНАТЫ</h1>
+        <ul>
+            {% for player in room.players %}
+                {% if player.user is not null %}
+                    <li>
+                        <p>{{ player.user.username }}</p>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    <h1>КАРТЫ ИГРОКОВ</h1>
+    <ul style="list-style:none;display:flex;flex-flow:row wrap;justify-content:space-around;">
+        {% for cardIn in room.cardsIn %}
+            {% if cardIn.player is not null and cardIn.card is not null %}
+                <li>
+                    <h1>{{ cardIn.card.caption }}</h1>
+                    <img src="/uploads/potion/{{ cardIn.card.file }}" width="150" />
+                    <p>Код: {{ cardIn.card.name }}</p>
+                    <p>Тип: {{ cardIn.card.type }}</p>
+                    <p>Очки: {{ cardIn.card.points }}</p>
+                    <ul>
+                        {% for requirement in cardIn.card.requirements %}
+                            <li>
+                                Нужен для сбора: {{ requirement.caption }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul>
+                        {% for ingridient in cardIn.card.ingridients %}
+                            <li>
+                                Дает ингридиент: {{ ingridient.caption }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <h1>КАРТЫ НА СТОЛЕ</h1>
+        <ul style="list-style:none;display:flex;flex-flow:row wrap;justify-content:space-around;">
+            {% for cardIn in room.cardsIn %}
+                {% if cardIn.card is not null and cardIn.onTable %}
+                    <li>
+                        <h1>{{ cardIn.card.caption }}</h1>
+                        <img src="/uploads/potion/{{ cardIn.card.file }}" width="150" />
+                        <p>Код: {{ cardIn.card.name }}</p>
+                        <p>Тип: {{ cardIn.card.type }}</p>
+                        <p>Очки: {{ cardIn.card.points }}</p>
+                        <ul>
+                            {% for requirement in cardIn.card.requirements %}
+                                <li>
+                                    Нужен для сбора: {{ requirement.caption }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <ul>
+                            {% for ingridient in cardIn.card.ingridients %}
+                                <li>
+                                    Дает ингридиент: {{ ingridient.caption }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    <h1>КАРТЫ КОМНАТЫ</h1>
+        <ul style="list-style:none;display:flex;flex-flow:row wrap;justify-content:space-around;">
+            {% for cardIn in room.cardsIn %}
+                {% if cardIn.card is not null and not cardIn.onTable %}
+                    <li>
+                        <h1>{{ cardIn.card.caption }}</h1>
+                        <img src="/uploads/potion/{{ cardIn.card.file }}" width="150" />
+                        <p>Код: {{ cardIn.card.name }}</p>
+                        <p>Тип: {{ cardIn.card.type }}</p>
+                        <p>Очки: {{ cardIn.card.points }}</p>
+                        <ul>
+                            {% for requirement in cardIn.card.requirements %}
+                                <li>
+                                    Нужен для сбора: {{ requirement.caption }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <ul>
+                            {% for ingridient in cardIn.card.ingridients %}
+                                <li>
+                                    Дает ингридиент: {{ ingridient.caption }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+{% endblock body%}

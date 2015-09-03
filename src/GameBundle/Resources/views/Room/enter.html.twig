@@ -1,0 +1,133 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <div ng-controller="RoomController as rc">
+        <button ng-click="rc.DEBUG = !rc.DEBUG">DEBUG</button>
+        <div ng-show="rc.game.status === rc.STATUS.PREPARE || rc.game.status === rc.STATUS.WAITING">
+            <div ng-show="rc.isCreator()">
+                <button ng-click="rc.play()">Начать игру, требуется > 2х человек</button>
+                <h2>Запросы в игру</h2>
+                <ul>
+                    <li ng-repeat="(user, username) in rc.game.requests">
+                        [[ username ]]
+                        <button ng-click="rc.allowRequest(user)">Подтвердить</button>
+                        <button ng-click="rc.denyRequest(user)">Отказать</button>
+                    </li>
+                </ul>
+            </div>
+            <button ng-show="!rc.isCreator() && !rc.isPlayer() && !rc.requestSended" ng-click="rc.sendRequest()">Отправить запрос</button>
+            <h2>Игроки</h2>
+            <ul>
+                <li ng-repeat="player in rc.game.players">
+                    [[ player ]]
+                </li>
+            </ul>
+        </div>
+        <div class="table" ng-show="rc.game.status === rc.STATUS.PLAY || rc.game.status === rc.STATUS.WATCHING">
+            <sub ng-show="rc.DEBUG">[[ rc.selectedCard ]]</sub>
+            <section style="background-color: #777777;padding:15px;margin:15px;">
+                <h2 style="text-align: center;">
+                    <span>Шкаф элементов (Ходит: [[ rc.game.turn.username ]])</span>
+                    <span ng-show="rc.game.turn.id === rc.PLAYERID"> (Фаза: [[ rc.game.phase ]])</span>
+                    <br>
+                    <button ng-show="rc.game.phase === rc.PHASE.GET && rc.game.turn.id === rc.PLAYERID" ng-click="rc.getCardFromDeck()">Взять карту из колоды</button>
+                </h2>
+                <ul style="display: flex;flex-flow: row wrap;justify-content: space-around;list-style: none;">
+                    <li ng-repeat="card in rc.game.onTable" ng-click="rc.selectCard(card.id, true)">
+                        <img src="/uploads/potion/[[ card.url ]]" width="150" />
+                        <div ng-show="rc.DEBUG">
+                            <p>Чтобы собрать:</p>
+                            <ul>
+                                <li ng-repeat="requirement in card.requirements">
+                                    <p>Название: [[ requirement.caption ]]</p>
+                                </li>
+                            </ul>
+                            <p>Дает ресурсы:</p>
+                            <ul>
+                                <li ng-repeat="ingridient in card.ingridients">
+                                    <p>Название: [[ ingridient.caption ]]</p>
+                                    <p>Название: [[ card.type ]]</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+            <section ng-show="rc.game.turn.id === rc.PLAYERID">
+                <h1 style="text-align:center;" ng-show="rc.game.phase === rc.PHASE.TURN">Выбирай карту и делай уже что нибудь</h1>
+            </section>
+            <section style="background-color:#D3D3D3;padding:15px;margin:15px;">
+                <div ng-show="rc.phaseTurnAndSelectedCard()">
+                    <div ng-show="!rc.selectMode">
+                        <button ng-click="rc.throwOnTable()">Сбросить</button>
+                        <button ng-show="rc.selectedCardIsSpell()" ng-click="rc.useCard()">Использовать</button>
+                        <button ng-show="!rc.selectedCardIsSpell()" ng-click="rc.makeCard()">Собрать</button>
+                    </div>
+                    <div ng-show="rc.selectMode">
+                        <button ng-click="rc.submitCard()">Подтвердить</button>
+                        <button ng-click="rc.cancelCard()">Отменить</button>
+                    </div>
+                </div>
+                <div>
+                    <h1 style="text-align: center;">[[ rc.game.players[rc.PLAYERID].username ]] ([[ rc.game.players[rc.PLAYERID].points ]])</h1>
+                    <div>
+                        <ul style="display: flex;flex-flow: row wrap;justify-content: space-around;list-style: none;">
+                            <li ng-repeat="card in rc.game.players[rc.PLAYERID].cards" ng-if="card.parent === null && card.recipe === false" ng-click="rc.selectCard(card.id, false)">
+                                <img src="/uploads/potion/[[ card.url ]]" width="150" />
+                                <div ng-show="rc.DEBUG">
+                                    <p>Чтобы собрать:</p>
+                                    <ul>
+                                        <li ng-repeat="requirement in card.requirements">
+                                            <p>Название: [[ requirement.caption ]]</p>
+                                        </li>
+                                    </ul>
+                                    <p>Дает ресурсы:</p>
+                                    <ul>
+                                        <li ng-repeat="ingridient in card.ingridients">
+                                            <p>Название: [[ ingridient.caption ]]</p>
+                                            <p>Название: [[ card.type ]]</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                        <div style="background-color: #ffcc00;padding: 15px;margin: 15px;" ng-show="rc.selectMode">
+                            <h2 style="text-align: center">КОТЕЛ</h2>
+                            <ul style="display: flex;flex-flow: row wrap;justify-content: space-around;list-style: none;">
+                                <li ng-repeat="card in rc.selectedCards" ng-click="rc.unselectCard(card.id)">
+                                    <img src="/uploads/potion/[[ card.url ]]" width="150" />
+                                </li>
+                                <li style="line-height:150px;font-weight: bold;"> -></li>
+                                <li>
+                                    <img src="/uploads/potion/[[ rc.selectedCard.url ]]" width="150" />
+                                </li>
+                            </ul>
+                        </div>
+                        <div style="background-color: #ffcc00;padding: 15px;margin: 15px;">
+                            <h2 style="text-align: center">СОБРАННЫЕ ЗЕЛЬЯ</h2>
+                            <ul style="display: flex;flex-flow: row wrap;justify-content: space-around;list-style: none;">
+                                <li ng-repeat="card in rc.game.players[rc.PLAYERID].cards" ng-if="card.parent !== null || card.recipe === true">
+                                    <img src="/uploads/potion/[[ card.url ]]" width="[[ card.parent === null ? 150 : 100 ]]" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section ng-repeat="(index, player) in rc.game.players" ng-if="player.id !== rc.PLAYERID" style="background-color:#D3D3D[[ index ]];padding:15px;margin:15px;">
+                <div>
+                    <h1 style="text-align: center;">[[ player.username ]] ([[ player.points ]])</h1>
+                    <div style="background-color: #ffcc00;padding: 15px;margin: 15px;">
+                        <h2 style="text-align: center">СОБРАННЫЕ ЗЕЛЬЯ</h2>
+                        <ul style="display: flex;flex-flow: row wrap;justify-content: space-around;list-style: none;">
+                            <li ng-repeat="card in player.cards" ng-if="card.parent !== null || card.recipe === true">
+                                <img src="/uploads/potion/[[ card.url ]]" width="[[ card.parent === null ? 150 : 100 ]]" />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <sub ng-show="rc.DEBUG">[[ rc.game ]]</sub>
+    </div>
+{% endblock body%}

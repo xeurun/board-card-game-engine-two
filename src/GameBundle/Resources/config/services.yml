@@ -1,0 +1,11 @@
+services:
+#    game.example:
+#        class: GameBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
+    user.helper:
+        class: GameBundle\Helpers\UserHelper
+        arguments: [ @security.encoder_factory, @security.token_storage ]
+
+    helper.user_rememberer:
+        class: GameBundle\Helpers\UserRememberHelper
+        arguments: [@service_container]

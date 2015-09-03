@@ -1,0 +1,7 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <div ng-controller="HomepageController as hc">
+        <button ng-click="hc.create()">create room</button>
+    </div>
+{% endblock body%}

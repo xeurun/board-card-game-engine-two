@@ -1,0 +1,22 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <div class="main-wrapper">
+        <div class="wrapper">
+            <div class="auth-content">
+                <div class="center-block security-form">
+                    <h1>{{ 'title.login'|trans }}</h1>
+                    {% include "GameBundle:Common:message.html.twig" %}
+                    <form action="{{ path("_security_login_check") }}" method="post" id="login">
+                        <input class="form-control" type="text" id="username" name="_username" value="{{ last_username }}" placeholder="Логин" autofocus required />
+                        <input class="form-control" type="password" id="password" name="_password" placeholder="Пароль" required />
+                        <label class="blue" for="remember_me"><input type="checkbox" id="remember_me" name="_remember_me" checked /> Запомнить меня</label>
+                        <p><input type="submit" class="btn auth-btn" value="Вход" /></p>
+                        <a href="{{ path('game_security_register') }}">{{ 'title.signup'|trans }}</a> <br/>
+                        <a href="{{ path('game_security_recover') }}">{{ 'title.forgot'|trans }}</a>
+                    </form>
+                </div>
+            </div>
+        </div><!-- .wrapper -->
+    </div>
+{% endblock %}

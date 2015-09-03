@@ -1,0 +1,17 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <div class="auth-content">
+        <div class="center-block security-form">
+        <h1>{{ 'title.register'|trans }}</h1>
+        {% include "GameBundle:Common:message.html.twig" %}
+        <div class="row">
+            <div class="">
+                {{ form_start(form) }}
+                {{ form_rest(form) }}
+                <input type="submit" class="btn auth-btn big-button pull-right" value="{{ 'btn.create'|trans }}" />
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

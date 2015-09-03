@@ -1,0 +1,6 @@
+game:
+    resource: "@GameBundle/Controller/"
+    type:     annotation
+
+logout:
+    path: /logout

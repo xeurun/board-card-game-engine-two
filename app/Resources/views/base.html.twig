@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html ng-app="potionmaker">
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}PotionMaker{% endblock %}</title>
+
+        {% javascripts
+            '../app/Resources/public/bower_components/angular/angular.js' %}
+            <script type="text/javascript" src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+
+        <script>
+            (function() {
+                "use strict";
+
+                angular
+                .module ('potionmaker', [])
+                .config (function($interpolateProvider, $sceDelegateProvider, $httpProvider) {
+                    $interpolateProvider.startSymbol('[[ ').endSymbol(' ]]');
+                    $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+                    $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+                })
+                .constant ("CONFIG", {
+                    ROUTING: {
+                        ROOM:  {
+                            CREATE: '{{ path("game_room_new") }}',
+                            ENTER:  '{{ path("game_room_enter", {hash: "_HASH_"}) }}'
+                        },
+                        API: {
+                            SEND: '{{ path("game_api_send") }}'
+                        }
+                    },
+                    GAME: {
+                        STATUS: {
+                            AUTH: 'auth',
+                            PREPARE: 'prepare',
+                            WATCHING: 'watching',
+                            WAITING: 'waiting',
+                            PLAY: 'play'
+                        },
+                        PHASE: {
+                            GET: 'get',
+                            TURN: 'turn'
+                        },
+                        CARDTYPE: {
+                            ALIAS : 'alias',
+                            INGRIDIENT : 'ingridient',
+                            POTION : 'potion',
+                            POWDER : 'powder',
+                            GREAT_POTION : 'great_potion',
+                            SUPREME_POTION : 'supreme_potion',
+                            MASCOT : 'mascot',
+                            GREAT_MASCOT : 'great_mascot',
+                            CREATION : 'creation',
+                            SPELL_TRANSFORM : 'spell_transform',
+                            SPELL_KNOWLEDGE : 'spell_knowledge',
+                            SPELL_DESTRUCTION : 'spell_destruction',
+                        }
+                    },
+                    USER: {
+                        ID: {{ app.user ? app.user.id : -1 }}
+                    },
+                    ROOM: {
+                        ID: {{ room is defined ? room.id : -1 }},
+                        ISCREATOR: '{{ room is defined ? room.isCreator(app.user.id) ? true : false : '' }}'
+                    }
+                })
+                .run(function($rootScope, CONFIG) {
+                    {% if ip is defined -%}
+                        if(CONFIG.ROOM.ID !== -1) {
+                            var connect = new WebSocket('ws://{{ ip }}:8080');
+                            connect.onopen = function(e) {
+                                console.log('Open: ' + e);
+                                $rootScope.$broadcast('websocket:send', {
+                                    event: 'auth'
+                                });
+                            };
+                            connect.onclose = function(e) {
+                                console.log('Close: ' + e);
+                            };
+                            connect.onerror = function(e) {
+                                console.log('Error: ' + e);
+                            };
+                            connect.onmessage = function(e) {
+                                console.log('Get message: ' + e.data);
+                                var message = JSON.parse(e.data);
+                                $rootScope.$broadcast('event:' + message.event, message);
+                            };
+                            $rootScope.$on('websocket:send', function(event, message) {
+                                message.room = CONFIG.ROOM.ID;
+                                message.user = CONFIG.USER.ID;
+                                console.log('Send message: ' + JSON.stringify(message));
+                                connect.send(JSON.stringify(message));
+                            });
+                        }
+                    {% endif -%}
+                });
+            })();
+        </script>
+
+        {% javascripts
+            '../app/Resources/public/js/Controllers/*' %}
+            <script type="text/javascript" src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+
+        {% stylesheets filter="compass"
+            "../app/Resources/public/sass/main.sass" %}
+
+            <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}" />
+        {% endstylesheets %}
+
+        {% block stylesheets %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

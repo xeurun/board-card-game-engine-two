@@ -1,0 +1,20 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <div class="main-wrapper">
+        <div class="wrapper">
+            <div class="auth-content">
+                <div class="center-block security-form">
+                    <h1>{{ 'title.forgotPassword'|trans }}</h1>
+                    {% include "GameBundle:Common:message.html.twig" %}
+
+                    {{ form_start(form) }}
+                    {{ form_row(form.email, { 'attr': {'placeholder': 'email.placeholder', autofocus: 'autofocus'} }) }}
+                    <input type="submit" class="btn auth-btn big-button pull-right" value="{{ 'btn.send'|trans }}" />
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+        </div><!-- .wrapper -->
+    </div>
+{% endblock %}

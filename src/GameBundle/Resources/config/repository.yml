@@ -1,0 +1,47 @@
+services:
+    base.repository:
+        class: GameBundle\Repository\BaseRepository
+        calls:
+            - [ setContainer, [ "@service_container" ] ]
+
+    user.repository:
+        parent: base.repository
+        class: GameBundle\Repository\UserRepository
+        factory: [@doctrine.orm.entity_manager, getRepository]
+        arguments: [ GameBundle:User ]
+
+    room.repository:
+        parent: base.repository
+        class: GameBundle\Repository\RoomRepository
+        factory: [@doctrine.orm.entity_manager, getRepository]
+        arguments: [ GameBundle:Room ]
+
+    element.repository:
+        parent: base.repository
+        class: GameBundle\Repository\ElementRepository
+        factory: [@doctrine.orm.entity_manager, getRepository]
+        arguments: [ GameBundle:Element ]
+
+    card.repository:
+        parent: base.repository
+        class: GameBundle\Repository\CardRepository
+        factory: [@doctrine.orm.entity_manager, getRepository]
+        arguments: [ GameBundle:Card ]
+
+    cardIn.repository:
+        parent: base.repository
+        class: GameBundle\Repository\CardInRepository
+        factory: [@doctrine.orm.entity_manager, getRepository]
+        arguments: [ GameBundle:CardIn ]
+
+    deck.repository:
+        parent: base.repository
+        class: GameBundle\Repository\DeckRepository
+        factory: [@doctrine.orm.entity_manager, getRepository]
+        arguments: [ GameBundle:Deck ]
+
+    player.repository:
+        parent: base.repository
+        class: GameBundle\Repository\PlayerRepository
+        factory: [@doctrine.orm.entity_manager, getRepository]
+        arguments: [ GameBundle:Player ]

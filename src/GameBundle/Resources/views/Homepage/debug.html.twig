@@ -1,0 +1,30 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <ul style="list-style:none;display:flex;flex-flow:row wrap;justify-content:space-around;">
+        {% for card in cards %}
+            <li>
+                <h1>{{ card.caption }}</h1>
+                <img src="/uploads/potion/{{ card.file }}" width="150" />
+                <p>Id: {{ card.id }}</p>
+                <p>Код: {{ card.name }}</p>
+                <p>Тип: {{ card.type }}</p>
+                <p>Очки: {{ card.points }}</p>
+                <ul>
+                    {% for requirement in card.requirements %}
+                        <li>
+                            Нужен для сбора: {{ requirement.caption }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for ingridient in card.ingridients %}
+                        <li>
+                            Дает ингридиент: {{ ingridient.caption }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock body%}
